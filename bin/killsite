@@ -10,6 +10,6 @@ end
 prefix = ARGV[0]
 limit = (ARGV[1] || 1).to_i
 
-ks = KillSite.new(prefix, limit, true)
+killer = SiteKiller.new(prefix, limit, true)
 
-EM.run { ks.run }
+EM.run { limit.times { killer.run } }
