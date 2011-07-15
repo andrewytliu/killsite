@@ -5,11 +5,11 @@
 
 Gem::Specification.new do |s|
   s.name = %q{killsite}
-  s.version = "0.1.0"
+  s.version = "0.2.0"
 
   s.required_rubygems_version = Gem::Requirement.new(">= 0") if s.respond_to? :required_rubygems_version=
   s.authors = ["Andrew Liu"]
-  s.date = %q{2011-07-15}
+  s.date = %q{2011-07-16}
   s.default_executable = %q{killsite}
   s.description = %q{Recursively GET the site by links, try to kill the site}
   s.email = %q{andrewliu33@gmail.com}
@@ -29,8 +29,7 @@ Gem::Specification.new do |s|
     "bin/killsite",
     "killsite.gemspec",
     "lib/killsite.rb",
-    "test/helper.rb",
-    "test/test_killsite.rb"
+    "test/helper.rb"
   ]
   s.homepage = %q{http://github.com/eggegg/killsite}
   s.licenses = ["MIT"]
