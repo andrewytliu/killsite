@@ -17,20 +17,20 @@ class SiteKiller
     http = EventMachine::HttpRequest.new(url).get
     http.callback do
       if @visited[url] == 0
-	puts "Processing '#{url}'" if @verbose
-	Nokogiri::HTML.parse(http.response).xpath("//a[@href]").each do |link|
-	  next_url = process_url link['href']
-	  if next_url and !@visited.include?(next_url)
-	    puts "  Queueing '#{next_url}'" if @verbose
+        puts "Processing '#{url}'" if @verbose
+        Nokogiri::HTML.parse(http.response).xpath("//a[@href]").each do |link|
+          next_url = process_url link['href']
+          if next_url and !@visited.include?(next_url)
+            puts "  Queueing '#{next_url}'" if @verbose
 
-	    @visited[next_url] = 0
-	    @count += @limit
-	    @limit.times { run next_url }
-	  end
-	end
-	print "  Progress " if @verbose
+            @visited[next_url] = 0
+            @count += @limit
+            @limit.times { run next_url }
+          end
+        end
+        print "  Progress " if @verbose
       else
-	print '*' if @verbose
+        print '*' if @verbose
       end
 
       @visited[url] += 1
@@ -40,7 +40,7 @@ class SiteKiller
     end
   end
 
-private
+  private
   def process_url url
     return nil if url =~ /^http/ and URI.parse(@prefix.to_s).host != URI.parse(url).host
     return nil if url =~ /^javascript/ or url =~ /^#/
