@@ -21,10 +21,13 @@ Gem::Specification.new do |s|
   s.files = [
     ".document",
     "Gemfile",
+    "Gemfile.lock",
     "LICENSE.txt",
     "README.rdoc",
     "Rakefile",
     "VERSION",
+    "bin/killsite",
+    "killsite.gemspec",
     "lib/killsite.rb",
     "test/helper.rb",
     "test/test_killsite.rb"
