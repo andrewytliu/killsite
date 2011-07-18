@@ -11,9 +11,11 @@ class SiteKiller
     @limit = limit
   end
 
-  def run url = nil
-    url ||= @prefix
+  def run url = @prefix
+    @limit.times { single_run url }
+  end
 
+  def single_run url
     http = EventMachine::HttpRequest.new(url).get
     http.callback do
       if @visited[url] == 0
@@ -25,7 +27,7 @@ class SiteKiller
 
             @visited[next_url] = 0
             @count += @limit
-            @limit.times { run next_url }
+            @limit.times { single_run next_url }
           end
         end
         print "  Progress " if @verbose
