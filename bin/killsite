@@ -48,6 +48,12 @@ end
 optparse.parse!
 
 options[:prefix] = ARGV.shift
+
+unless options[:prefix]
+  puts "Please specify the URL"
+  exit 4
+end
+
 monitors = (options[:pid]) ? [MemoryMonitor.new(options[:pid])] : []
 SiteKiller.new(options[:prefix], options[:limit], options[:concurrency], true, monitors).run
 monitors.each(&:report) unless monitors.empty?
