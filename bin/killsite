@@ -4,11 +4,16 @@ require 'optparse'
 require 'killsite'
 require 'memory_monitor'
 
+if `which ab`.empty?
+  puts "ab (ApacheBench) must be installed to proceed"
+  exit -1
+end
+
 options = {}
 
 optparse = OptionParser.new do |opts|
   opts.on('-h', '--help', 'Show help message') do
-    puts "USAGE: killsite [site] [limit] [pid]"
+    puts opts
     exit 0
   end
   
@@ -23,7 +28,7 @@ optparse = OptionParser.new do |opts|
     
   opts.on('-c', '--concurrency NUM', 'Setting the number of concurrent connection') do |num|
     if num.to_i > 0
-      options[:concurrent] = num.to_i
+      options[:concurrency] = num.to_i
     else
       puts "The number of concurrency must greater than 1"
       exit 2
@@ -44,8 +49,5 @@ optparse.parse!
 
 options[:prefix] = ARGV.shift
 monitors = (options[:pid]) ? [MemoryMonitor.new(options[:pid])] : []
-killer = SiteKiller.new(options[:prefix], options[:limit], true, monitors)
-
-EM.run { killer.run }
-
+SiteKiller.new(options[:prefix], options[:limit], options[:concurrency], true, monitors).run
 monitors.each(&:report) unless monitors.empty?
