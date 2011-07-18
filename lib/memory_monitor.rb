@@ -1,5 +1,3 @@
-require 'bundler'
-Bundler.require
 
 class MemoryMonitor
   def initialize pid
@@ -16,12 +14,20 @@ class MemoryMonitor
   end
   
   def report
-    sorted = @data.sort_by { |id, (url, memories)| memories.last - memories.first }
-    puts sorted.inspect
+    combined = @data.values.inject(Hash.new(0)) { |h, (url, memories)| h[url] += memories.last - memories.first; h }
+    sorted = combined.sort_by { |url, memory| -memory }
+    
+    
+    puts "\nMost memory used actions:"
+    sorted.each_with_index do |(url, memory), index|
+      puts "##{index + 1}\t#{memory/1024} KB\t=> #{url.to_s}"
+    end
   end
   
   private
   def memory
-    `ps -o rss #{@pid}`[/\d+/].to_i
+    mem = `ps -o rss #{@pid}`[/\d+/].to_i
+    raise 'invalid PID' unless mem > 0
+    mem
   end
 end

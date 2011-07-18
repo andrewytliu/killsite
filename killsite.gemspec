@@ -29,6 +29,7 @@ Gem::Specification.new do |s|
     "bin/killsite",
     "killsite.gemspec",
     "lib/killsite.rb",
+    "lib/memory_monitor.rb",
     "test/helper.rb"
   ]
   s.homepage = %q{http://github.com/eggegg/killsite}

@@ -17,3 +17,5 @@ monitors = (pid) ? [MemoryMonitor.new(pid)] : []
 killer = SiteKiller.new(prefix, limit, true, monitors)
 
 EM.run { killer.run }
+
+monitors.each(&:report) unless monitors.empty?
