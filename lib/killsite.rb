@@ -5,54 +5,44 @@ require 'nokogiri'
 class SiteKiller
   def initialize(prefix, limit = 1, verbose = false, observers = [])
     @count = 1
-    @serial = "1"
     @prefix = URI.parse(prefix)
-    @visited = { @prefix => 0 }
+    @visited = [@prefix]
     @verbose = verbose
     @limit = limit
     @observers = observers
   end
 
   def run url = @prefix
-    @limit.times { single_run url }
-  end
-
-  def single_run url
-    id = @serial.succ!.dup
-    @observers.each { |o| o.before_request(id, url) if o.respond_to? :before_request }
+    @observers.each { |o| o.before_request(url) if o.respond_to? :before_request }
     
-    http = EventMachine::HttpRequest.new(url).get
-    http.errback do
-      @count -= 1
-      print 'X'
-      EM.stop if @count == 0
-    end
+    multi = EventMachine::MultiRequest.new
+    @limit.times { multi.add(EventMachine::HttpRequest.new(url).get) }
     
-    http.callback do
-      @observers.each { |o| o.after_request(id, url) if o.respond_to? :after_request }
-      if @visited[url] == 0
-        puts "Processing '#{url}'" if @verbose
+    multi.callback do
+      @observers.each { |o| o.after_request(url) if o.respond_to? :after_request }
+      
+      http = (multi.responses[:succeeded].size > 0) ? multi.responses[:succeeded].first : nil
+      
+      puts "Processing '#{url}'" if @verbose
+      if http
         Nokogiri::HTML.parse(http.response).xpath("//a[@href]").each do |link|
           next_url = process_url link['href']
           if next_url and !@visited.include?(next_url)
             puts "  Queueing '#{next_url}'" if @verbose
 
-            @visited[next_url] = 0
-            @count += @limit
-            @limit.times { single_run next_url }
+            @visited << next_url
+            @count += 1
+            run next_url
           end
         end
-        print "  Progress *" if @verbose
-        $stdout.flush
       else
-        print '*' if @verbose
-        $stdout.flush
+        puts "  No valid response"
       end
-
-      @visited[url] += 1
-      puts if @verbose and @visited[url] == @limit
+      puts "  Progress #{'*' * multi.responses[:succeeded].size}#{'X' * multi.responses[:failed].size}" if @verbose
+      $stdout.flush
+      
       @count -= 1
-      EM.stop if @count == 0
+      EventMachine.stop if @count == 0
     end
   end
 

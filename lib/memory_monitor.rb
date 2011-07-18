@@ -5,17 +5,16 @@ class MemoryMonitor
     @data = {}
   end
   
-  def before_request id, url
-    @data[id] = [url, [memory]]
+  def before_request url
+    @data[url] = memory
   end
   
-  def after_request id, url
-    @data[id].last << memory
+  def after_request url
+    @data[url] = memory - @data[url]
   end
   
   def report
-    combined = @data.values.inject(Hash.new(0)) { |h, (url, memories)| h[url] += memories.last - memories.first; h }
-    sorted = combined.sort_by { |url, memory| -memory }
+    sorted = @data.sort_by { |url, memory| -memory }
     
     
     puts "\nMost memory used actions:"
