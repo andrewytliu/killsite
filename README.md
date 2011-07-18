@@ -13,11 +13,11 @@ Simply `gem install killsite`.
 
 ## Usage
 
-Usage: killsite [options]
-    -h, --help                       Show help message
-    -l, --limit NUM                  Setting the limit of a single test
-    -c, --concurrency NUM            Setting the number of concurrent connection
-    -p, --pid PID                    The PID is the monitored server process
+    Usage: killsite [options]
+        -h, --help                       Show help message
+        -l, --limit NUM                  Setting the limit of a single test
+        -c, --concurrency NUM            Setting the number of concurrent connection
+        -p, --pid PID                    The PID is the monitored server process
 
 ## Copyright
 
