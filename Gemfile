@@ -1,6 +1,5 @@
 source :rubygems
 
-gem "em-http-request"
 gem "nokogiri"
 
 group :development do
