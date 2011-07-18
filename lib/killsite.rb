@@ -3,12 +3,14 @@ require 'uri'
 Bundler.require
 
 class SiteKiller
-  def initialize(prefix, limit = 1, verbose = false)
+  def initialize(prefix, limit = 1, verbose = false, observers = [])
     @count = 1
+    @serial = "1"
     @prefix = URI.parse(prefix)
     @visited = { @prefix => 0 }
     @verbose = verbose
     @limit = limit
+    @observers = observers
   end
 
   def run url = @prefix
@@ -16,8 +18,12 @@ class SiteKiller
   end
 
   def single_run url
+    id = @serial.succ!.dup
+    @observers.each { |o| o.before_request(id, url) if o.respond_to? :before_request }
+    
     http = EventMachine::HttpRequest.new(url).get
     http.callback do
+      @observers.each { |o| o.after_request(id, url) if o.respond_to? :after_request }
       if @visited[url] == 0
         puts "Processing '#{url}'" if @verbose
         Nokogiri::HTML.parse(http.response).xpath("//a[@href]").each do |link|

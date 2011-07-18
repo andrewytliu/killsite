@@ -1,15 +1,19 @@
 #!/usr/bin/env ruby
 
 require 'killsite'
+require 'memory_monitor'
 
 if ARGV.size == 0
-  puts "USAGE: killsite [site] [limit]"
+  puts "USAGE: killsite [site] [limit] [pid]"
   exit
 end
 
 prefix = ARGV[0]
 limit = (ARGV[1] || 1).to_i
+pid = ARGV[2]
 
-killer = SiteKiller.new(prefix, limit, true)
+monitors = (pid) ? [MemoryMonitor.new(pid)] : []
+
+killer = SiteKiller.new(prefix, limit, true, monitors)
 
 EM.run { killer.run }
